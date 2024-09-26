@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBの値を表示・更新</title>
+</head>
+<body>
+    <!-- <h1>現在の値: {{ name.name }}</h1>
+    
+    <form action="/update" method="post">
+        <input type="text" name="new_value" placeholder="新しい値を入力">
+        <button type="submit">値を更新</button>
+    </form> -->
+
+    <h1>建物一覧</h1>
+
+    <div class="building-list">
+        <div class="building-item">
+            <a href="/building1">
+                <img src="images/kiyomizu.jpeg" alt="建物1のアイコン">
+                建物1
+            </a>
+        </div>
+        <div class="building-item">
+            <a href="building2.html">
+                <img src="images/kinkaku.jpeg" alt="建物2のアイコン">
+                建物2
+            </a>
+        </div>
+        <!-- 他の建物も同様に追加 -->
+        <div class="building-list">
+            {% for building in buildings %}
+            <div class="building-item">
+                <a href="/building{{ building.id }}">
+                    <h2>{{ building.name }}</h2>
+                    <p>{{ building.address }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
