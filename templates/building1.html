@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>建物1の詳細</title> -->
+    <title>{{ building.name }}の詳細</title>
+    <style>
+        .review-form {
+            margin-top: 30px;
+        }
+        .review {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- <h1>建物1の詳細</h1> -->
+    <img src="images/kiyomizu.jpeg" alt="建物1のアイコン">
+    <h1>{{ building.name }}</h1>
+
+    <div class="building-info">
+        <h2>紹介文</h2>
+        <p>{{ building.description }}</p>
+        
+        <h2>住所</h2>
+        <p>{{ building.address }}</p>
+    </div>
+
+
+    <h2>口コミ</h2>
+    <div id="reviews">
+        <!-- ここに口コミが表示される -->
+        {% for review in reviews %}
+        <div class="review {% if review.is_reported %}is-reported{% endif %}" id="review-{{ review.id }}">
+            <p>{{ review.review }}</p>
+            {% if not review.is_reported %}
+            <button class="report-btn" onclick="reportReview({{ review.id }})">通報する</button>
+            {% else %}
+            <p>この口コミは通報されました。</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="review-form">
+        <h3>口コミを投稿する</h3>
+        <form id="reviewForm">
+            <textarea id="reviewText" rows="4" cols="50" placeholder="口コミを入力"></textarea><br><br>
+            <button type="submit">投稿する</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('reviewForm');
+
+        // フォームの送信処理
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const reviewText = document.getElementById('reviewText').value;
+
+            // 非同期でサーバーに口コミを送信
+            fetch('/add_review', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'review_text=' + encodeURIComponent(reviewText)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 口コミが追加されたら、ページをリロードして反映
+                    location.reload();
+                }
+            });
+        });
+
+        // 口コミを通報する処理
+        function reportReview(reviewId) {
+            const formData = new FormData();
+            formData.append('review_id', reviewId);
+
+            fetch('/report_review', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('review-' + reviewId).classList.add('is-reported');
+                    document.getElementById('review-' + reviewId).querySelector('.report-btn').remove();
+                    const reportedMessage = document.createElement('p');
+                    reportedMessage.textContent = 'この口コミは通報されました。';
+                    document.getElementById('review-' + reviewId).appendChild(reportedMessage);
+                }
+            });
+        }
+    </script>
+
+    <div><a href="/">メインページへ戻る</a></div>
+
+</body>
+</html>
